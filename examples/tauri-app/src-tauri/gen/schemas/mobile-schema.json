@@ -2145,10 +2145,10 @@
           "markdownDescription": "Denies the unminimize command without any pre-configured scope."
         },
         {
-          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-get-latest-intent`",
+          "description": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-get-latest-intent`\n- `allow-get-latest-intent-and-extract-text`",
           "type": "string",
           "const": "mobile-sharetarget:default",
-          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-get-latest-intent`"
+          "markdownDescription": "Default permissions for the plugin\n#### This default permission set includes:\n\n- `allow-get-latest-intent`\n- `allow-get-latest-intent-and-extract-text`"
         },
         {
           "description": "Enables the get_latest_intent command without any pre-configured scope.",
@@ -2157,10 +2157,22 @@
           "markdownDescription": "Enables the get_latest_intent command without any pre-configured scope."
         },
         {
+          "description": "Enables the get_latest_intent_and_extract_text command without any pre-configured scope.",
+          "type": "string",
+          "const": "mobile-sharetarget:allow-get-latest-intent-and-extract-text",
+          "markdownDescription": "Enables the get_latest_intent_and_extract_text command without any pre-configured scope."
+        },
+        {
           "description": "Denies the get_latest_intent command without any pre-configured scope.",
           "type": "string",
           "const": "mobile-sharetarget:deny-get-latest-intent",
           "markdownDescription": "Denies the get_latest_intent command without any pre-configured scope."
+        },
+        {
+          "description": "Denies the get_latest_intent_and_extract_text command without any pre-configured scope.",
+          "type": "string",
+          "const": "mobile-sharetarget:deny-get-latest-intent-and-extract-text",
+          "markdownDescription": "Denies the get_latest_intent_and_extract_text command without any pre-configured scope."
         }
       ]
     },

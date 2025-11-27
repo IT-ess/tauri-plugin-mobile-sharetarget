@@ -45,7 +45,10 @@ impl<R: Runtime, T: Manager<R>> crate::MobileSharetargetExt<R> for T {
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("mobile-sharetarget")
-        .invoke_handler(tauri::generate_handler![commands::get_latest_intent])
+        .invoke_handler(tauri::generate_handler![
+            commands::get_latest_intent,
+            commands::get_latest_intent_and_extract_text
+        ])
         .setup(|app, api| {
             #[cfg(mobile)]
             let mobile_sharetarget = mobile::init(app, api)?;

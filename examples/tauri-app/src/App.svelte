@@ -1,10 +1,10 @@
 <script>
     import Greet from "./lib/Greet.svelte";
-    import { getLatestIntent } from "tauri-plugin-mobile-sharetarget-api";
+    import { getLatestIntentAndExtractText } from "tauri-plugin-mobile-sharetarget-api";
 
     let latestIntent = $state();
     async function displayLatestIntent() {
-        latestIntent = await getLatestIntent();
+        latestIntent = await getLatestIntentAndExtractText();
     }
 </script>
 

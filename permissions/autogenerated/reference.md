@@ -5,6 +5,7 @@ Default permissions for the plugin
 #### This default permission set includes the following:
 
 - `allow-get-latest-intent`
+- `allow-get-latest-intent-and-extract-text`
 
 ## Permission Table
 
@@ -37,6 +38,32 @@ Enables the get_latest_intent command without any pre-configured scope.
 <td>
 
 Denies the get_latest_intent command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`mobile-sharetarget:allow-get-latest-intent-and-extract-text`
+
+</td>
+<td>
+
+Enables the get_latest_intent_and_extract_text command without any pre-configured scope.
+
+</td>
+</tr>
+
+<tr>
+<td>
+
+`mobile-sharetarget:deny-get-latest-intent-and-extract-text`
+
+</td>
+<td>
+
+Denies the get_latest_intent_and_extract_text command without any pre-configured scope.
 
 </td>
 </tr>

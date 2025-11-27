@@ -5,14 +5,27 @@ import android.content.Intent
 import android.webkit.WebView
 import app.tauri.annotation.TauriPlugin
 import app.tauri.plugin.Plugin
+import app.tauri.annotation.InvokeArg
 
+
+@InvokeArg
+class Config {
+    var lib: String? = "tauri_app_lib"
+}
 
 @TauriPlugin
 class SharetargetPlugin(private val activity: Activity): Plugin(activity) {
-    private val implementation = Sharetarget()
+    private var lib: String? = "tauri_app_lib"
+    private var implementation = Sharetarget(lib)
 
     /// Handle intents when app is being launched
     override fun load(webView: WebView) {
+        getConfig(Config::class.java).let {
+            this.lib = it.lib
+        }
+
+        this.implementation = Sharetarget(lib)
+
         val intent = activity.intent
 
         if (intent.action == Intent.ACTION_SEND) {

@@ -7,7 +7,7 @@ class Sharetarget {
 
     init {
         try {
-            System.loadLibrary("tauri_app_lib")
+            System.loadLibrary("refs_app_lib")
             Log.d(TAG, "Successfully loaded libtauri_app_lib.so")
         } catch (e: UnsatisfiedLinkError) {
             Log.e(TAG, "Faileapp_libd to load libtauri_app_lib.so", e)

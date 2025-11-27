@@ -2,14 +2,8 @@ package com.plugin.mobilesharetarget
 
 import android.util.Log
 
-class Example {
+class Sharetarget {
     private val TAG = "mobilesharetarget"
-
-    fun pong(value: String): String {
-        Log.i("Pong", value)
-        return value
-    }
-
 
     init {
         try {

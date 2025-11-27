@@ -1,7 +1,7 @@
 use serde::de::DeserializeOwned;
 use tauri::{
-  plugin::{PluginApi, PluginHandle},
-  AppHandle, Runtime,
+    plugin::{PluginApi, PluginHandle},
+    AppHandle, Runtime,
 };
 
 use crate::models::*;
@@ -11,24 +11,18 @@ tauri::ios_plugin_binding!(init_plugin_mobile_sharetarget);
 
 // initializes the Kotlin or Swift plugin classes
 pub fn init<R: Runtime, C: DeserializeOwned>(
-  _app: &AppHandle<R>,
-  api: PluginApi<R, C>,
+    _app: &AppHandle<R>,
+    api: PluginApi<R, C>,
 ) -> crate::Result<MobileSharetarget<R>> {
-  #[cfg(target_os = "android")]
-  let handle = api.register_android_plugin("com.plugin.mobilesharetarget", "ExamplePlugin")?;
-  #[cfg(target_os = "ios")]
-  let handle = api.register_ios_plugin(init_plugin_mobile_sharetarget)?;
-  Ok(MobileSharetarget(handle))
+    #[cfg(target_os = "android")]
+    let handle =
+        api.register_android_plugin("com.plugin.mobilesharetarget", "SharetargetPlugin")?;
+    #[cfg(target_os = "ios")]
+    let handle = api.register_ios_plugin(init_plugin_mobile_sharetarget)?;
+    Ok(MobileSharetarget(handle))
 }
 
 /// Access to the mobile-sharetarget APIs.
 pub struct MobileSharetarget<R: Runtime>(PluginHandle<R>);
 
-impl<R: Runtime> MobileSharetarget<R> {
-  pub fn ping(&self, payload: PingRequest) -> crate::Result<PingResponse> {
-    self
-      .0
-      .run_mobile_plugin("ping", payload)
-      .map_err(Into::into)
-  }
-}
+impl<R: Runtime> MobileSharetarget<R> {}

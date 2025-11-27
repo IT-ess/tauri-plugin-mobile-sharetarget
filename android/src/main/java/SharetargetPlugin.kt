@@ -3,30 +3,13 @@ package com.plugin.mobilesharetarget
 import android.app.Activity
 import android.util.Log
 import android.webkit.WebView
-import app.tauri.annotation.Command
-import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
-import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
-import app.tauri.plugin.Invoke
 
-@InvokeArg
-class PingArgs {
-  var value: String? = null
-}
 
 @TauriPlugin
-class ExamplePlugin(private val activity: Activity): Plugin(activity) {
-    private val implementation = Example()
-
-    @Command
-    fun ping(invoke: Invoke) {
-        val args = invoke.parseArgs(PingArgs::class.java)
-
-        val ret = JSObject()
-        ret.put("value", implementation.pong(args.value ?: "default value :("))
-        invoke.resolve(ret)
-    }
+class SharetargetPlugin(private val activity: Activity): Plugin(activity) {
+    private val implementation = Sharetarget()
 
     override fun load(webView: WebView) {
         val result = implementation.helloWorld("World")

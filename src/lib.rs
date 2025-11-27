@@ -41,7 +41,7 @@ impl<R: Runtime, T: Manager<R>> crate::MobileSharetargetExt<R> for T {
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("mobile-sharetarget")
-        .invoke_handler(tauri::generate_handler![commands::ping])
+        .invoke_handler(tauri::generate_handler![])
         .setup(|app, api| {
             #[cfg(mobile)]
             let mobile_sharetarget = mobile::init(app, api)?;
@@ -55,7 +55,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
 #[cfg(target_os = "android")]
 #[no_mangle]
-pub extern "system" fn Java_com_plugin_mobilesharetarget_Example_helloWorld(
+pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_helloWorld(
     mut env: JNIEnv,
     _class: JClass,
     name: JString,

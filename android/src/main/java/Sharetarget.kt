@@ -16,4 +16,6 @@ class Sharetarget {
     }
 
     external fun helloWorld(name: String): String?
+    external fun pushIntent(intent: String)
+
 }

@@ -4,7 +4,7 @@ use tauri::{
     AppHandle, Runtime,
 };
 
-use crate::models::*;
+use crate::intents::pop_intent;
 
 #[cfg(target_os = "ios")]
 tauri::ios_plugin_binding!(init_plugin_mobile_sharetarget);
@@ -25,4 +25,8 @@ pub fn init<R: Runtime, C: DeserializeOwned>(
 /// Access to the mobile-sharetarget APIs.
 pub struct MobileSharetarget<R: Runtime>(PluginHandle<R>);
 
-impl<R: Runtime> MobileSharetarget<R> {}
+impl<R: Runtime> MobileSharetarget<R> {
+    pub fn get_latest_intent(&self) -> crate::Result<Option<String>> {
+        Ok(pop_intent())
+    }
+}

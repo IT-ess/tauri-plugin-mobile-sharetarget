@@ -4,7 +4,7 @@ Default permissions for the plugin
 
 #### This default permission set includes the following:
 
-- `allow-ping`
+- `allow-get-latest-intent`
 
 ## Permission Table
 
@@ -18,12 +18,12 @@ Default permissions for the plugin
 <tr>
 <td>
 
-`mobile-sharetarget:allow-ping`
+`mobile-sharetarget:allow-get-latest-intent`
 
 </td>
 <td>
 
-Enables the ping command without any pre-configured scope.
+Enables the get_latest_intent command without any pre-configured scope.
 
 </td>
 </tr>
@@ -31,12 +31,12 @@ Enables the ping command without any pre-configured scope.
 <tr>
 <td>
 
-`mobile-sharetarget:deny-ping`
+`mobile-sharetarget:deny-get-latest-intent`
 
 </td>
 <td>
 
-Denies the ping command without any pre-configured scope.
+Denies the get_latest_intent command without any pre-configured scope.
 
 </td>
 </tr>

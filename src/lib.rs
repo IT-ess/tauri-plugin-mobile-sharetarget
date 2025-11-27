@@ -59,31 +59,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
 #[cfg(target_os = "android")]
 #[no_mangle]
-pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_helloWorld(
-    mut env: JNIEnv,
-    _class: JClass,
-    name: JString,
-) -> jstring {
-    println!("Calling JNI Hello World!");
-
-    let input: String = env
-        .get_string(&name)
-        .expect("Couldn't get java string!")
-        .into();
-
-    let result = format!("Hello, {}!", input);
-
-    match env.new_string(result) {
-        Ok(jstr) => jstr.into_raw(),
-        Err(e) => {
-            eprintln!("Failed to create JString: {}", e);
-            std::ptr::null_mut()
-        }
-    }
-}
-
-#[cfg(target_os = "android")]
-#[no_mangle]
 pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_pushIntent(
     mut env: JNIEnv,
     _class: JClass,

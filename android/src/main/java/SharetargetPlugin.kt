@@ -12,55 +12,41 @@ import app.tauri.annotation.TauriPlugin
 import app.tauri.plugin.JSObject
 import app.tauri.plugin.Plugin
 import androidx.core.net.toUri
-import androidx.lifecycle.ViewModelProvider.NewInstanceFactory.Companion.instance
 
 
 @TauriPlugin
 class SharetargetPlugin(private val activity: Activity): Plugin(activity) {
-
-    private var webView: WebView? = null
     private val implementation = Sharetarget()
 
-    companion object {
-        var instance: SharetargetPlugin? = null
-    }
-
     override fun load(webView: WebView) {
-        instance = this
-
         val intent = activity.intent
 
         if (intent.action == Intent.ACTION_SEND) {
-            val payload = intentToJson(intent)
-            val targetUri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM).toString()
-            val name = getNameFromUri(activity.applicationContext, targetUri.toUri())
-            if (name != null && name != "") {
-                payload.put("name", name)
-                Log.i("got name", name)
-            }
-            Log.i("triggering event", payload.toString())
-            implementation.pushIntent(payload.toString())
+            pushIntentToRust(intent)
         }
-
-        super.load(webView)
-        this.webView = webView
     }
 
     /// Send all new intents to registered listeners.
     override fun onNewIntent(intent: Intent) {
         if (intent.action == Intent.ACTION_SEND) {
-            val payload = intentToJson(intent)
-            val targetUri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM).toString()
-            val name = getNameFromUri(activity.applicationContext, targetUri.toUri())
-            if (name != null && name != "") {
-                payload.put("name", name)
-                Log.i("got name", name)
-            }
-            Log.i("triggering event", payload.toString())
-            implementation.pushIntent(payload.toString())
+            pushIntentToRust(intent)
         }
     }
+
+    fun pushIntentToRust(intent: Intent) {
+        val payload = intentToJson(intent)
+        val targetUri = intent.getParcelableExtra<Parcelable>(Intent.EXTRA_STREAM).toString()
+        val name = getNameFromUri(activity.applicationContext, targetUri.toUri())
+        if (name != null && name != "") {
+            payload.put("name", name)
+            Log.i("got name", name)
+        }
+        Log.i("triggering event", payload.toString())
+        implementation.pushIntent(payload.toString())
+    }
 }
+
+
 
 fun intentToJson(intent: Intent): JSObject {
     val json = JSObject()

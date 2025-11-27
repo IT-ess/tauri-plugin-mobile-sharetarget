@@ -1,6 +1,6 @@
 use tauri::{command, AppHandle, Runtime};
 
-use crate::{MobileSharetargetExt, Result};
+use crate::{MobileSharetargetExt, PingRequest, PingResponse, Result};
 
 #[command]
 pub(crate) fn get_latest_intent<R: Runtime>(app: AppHandle<R>) -> Result<Option<String>> {
@@ -10,7 +10,10 @@ pub(crate) fn get_latest_intent<R: Runtime>(app: AppHandle<R>) -> Result<Option<
 #[command]
 pub(crate) fn get_latest_intent_and_extract_text<R: Runtime>(
     app: AppHandle<R>,
-) -> Result<Option<String>> {
-    app.mobile_sharetarget()
-        .get_latest_intent_and_extract_text()
+) -> Result<PingResponse> {
+    app.mobile_sharetarget().test_hello_world(PingRequest {
+        value: Some("Hey".to_string()),
+    })
+    //app.mobile_sharetarget()
+    //    .get_latest_intent_and_extract_text()
 }

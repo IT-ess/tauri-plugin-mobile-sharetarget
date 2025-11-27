@@ -31,7 +31,7 @@
 
     <div>
         <button onclick={displayLatestIntent}>Get Latest intent</button>
-        <div>{latestIntent}</div>
+        <div>{JSON.stringify(latestIntent)}</div>
     </div>
 </main>
 

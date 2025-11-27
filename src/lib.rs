@@ -1,3 +1,5 @@
+use std::ffi::{c_char, CStr, CString};
+
 #[cfg(target_os = "android")]
 use jni::{
     objects::{JClass, JString},
@@ -75,4 +77,33 @@ pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_pushIntent(
         .into();
 
     push_new_intent(input);
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn hello_world_ffi(c_name: *const c_char) -> *mut c_char {
+    println!("Called hello world !");
+    let name = match CStr::from_ptr(c_name).to_str() {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("[iOS FFI] Failed to convert C string: {}", e);
+            return std::ptr::null_mut();
+        }
+    };
+
+    let result = format!("Hello, {}!", name);
+
+    match CString::new(result) {
+        Ok(c_str) => c_str.into_raw(),
+        Err(e) => {
+            eprintln!("[iOS FFI] Failed to create C string: {}", e);
+            std::ptr::null_mut()
+        }
+    }
+}
+
+#[no_mangle]
+pub unsafe extern "C" fn free_hello_result_ffi(result: *mut c_char) {
+    if !result.is_null() {
+        drop(CString::from_raw(result));
+    }
 }

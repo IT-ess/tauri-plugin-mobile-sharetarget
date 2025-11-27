@@ -55,7 +55,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
 #[cfg(target_os = "android")]
 #[no_mangle]
-pub extern "system" fn Java_com_plugin_mobilesharetarget_HelloWorld_helloWorld(
+pub extern "system" fn Java_com_plugin_mobilesharetarget_Example_helloWorld(
     mut env: JNIEnv,
     _class: JClass,
     name: JString,

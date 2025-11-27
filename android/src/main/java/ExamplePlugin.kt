@@ -1,6 +1,8 @@
 package com.plugin.mobilesharetarget
 
 import android.app.Activity
+import android.util.Log
+import android.webkit.WebView
 import app.tauri.annotation.Command
 import app.tauri.annotation.InvokeArg
 import app.tauri.annotation.TauriPlugin
@@ -16,7 +18,6 @@ class PingArgs {
 @TauriPlugin
 class ExamplePlugin(private val activity: Activity): Plugin(activity) {
     private val implementation = Example()
-//    private val jniBridge = HelloWorld()
 
     @Command
     fun ping(invoke: Invoke) {
@@ -27,10 +28,10 @@ class ExamplePlugin(private val activity: Activity): Plugin(activity) {
         invoke.resolve(ret)
     }
 
-//    override fun load(webView: WebView) {
-//        val result = jniBridge.helloWorld("World")
-//        Log.d("mobilesharetarget", "JNI Result: $result")
-//    }
+    override fun load(webView: WebView) {
+        val result = implementation.helloWorld("World")
+        Log.d("mobilesharetarget", "JNI Result: $result")
+    }
 
     /// Send all new intents to registered listeners.
 //    override fun onNewIntent(intent: Intent) {
@@ -48,21 +49,3 @@ class ExamplePlugin(private val activity: Activity): Plugin(activity) {
 //        helloWorld("Alexis")
 //    }
 }
-
-//class HelloWorld {
-//    private const val TAG = "mobilesharetarget"
-//
-//    init {
-//        try {
-//            // Load the native library (libapp_lib.so)
-//            // This is the shared library built by Cargo with crate-type = ["cdylib"]
-//            System.loadLibrary("tauri_plugin_mobile_sharetarget")
-//            Log.d(TAG, "Successfully loaded libapp_lib.so")
-//        } catch (e: UnsatisfiedLinkError) {
-//            Log.e(TAG, "Failed to load libapp_lib.so", e)
-//            throw e
-//        }
-//    }t
-//
-//    external fun helloWorld(name: String): String?
-//}

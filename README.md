@@ -5,6 +5,10 @@
 This plugin is an alternative to [tauri-plugin-sharetarget](https://gitlab.com/lafleurdeboum/tauri-plugin-sharetarget).
 It is command based rather than event based, making the management of incoming intents more reliable, especially when your webview isn't able to listen to events yet. 
 
+## Showcase
+
+![Showcase](assets/showcase.gif)
+
 ## Installation
 
 ### Android
@@ -299,7 +303,7 @@ Here's a Svelte 5 snippet that uses the plugin to consume the queue when the app
 	onDestroy(() => {
 		focusUnlistener();
 	});
-	```
+```
 
 ## Example
 An example app is provided in this repo under `examples/tauri-app`.

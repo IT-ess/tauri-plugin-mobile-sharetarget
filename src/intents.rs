@@ -14,6 +14,7 @@ pub(crate) fn pop_intent() -> Option<String> {
 pub(crate) fn pop_and_extract_text_intent() -> Option<String> {
     let raw_intent_opt = pop_intent();
     if cfg!(target_os = "ios") {
+        // Extract the url from the deep-link
         raw_intent_opt.map(|url| {
             let prefix = format!("{}://share?url=", crate::IOS_DEEP_LINK_SCHEME.wait());
             url.strip_prefix(&prefix)
@@ -21,7 +22,7 @@ pub(crate) fn pop_and_extract_text_intent() -> Option<String> {
                 .expect("Shared URLs should respect this prefix")
         })
     } else {
-        // We only need to extract the text for Android intents
+        // Extract the url from the android intent
         raw_intent_opt
             .map(|i| extract_android_intent_extra(&i, TEXT_INTENT_KEY))
             .flatten()

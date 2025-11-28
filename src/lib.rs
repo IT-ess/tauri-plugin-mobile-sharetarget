@@ -107,3 +107,18 @@ pub unsafe extern "C" fn free_hello_result_ffi(result: *mut c_char) {
         drop(CString::from_raw(result));
     }
 }
+
+#[cfg(target_os = "ios")]
+#[no_mangle]
+pub unsafe extern "C" fn push_intent_ffi(c_name: *const c_char) {
+    println!("Called hello world !");
+    let intent = match CStr::from_ptr(c_name).to_str() {
+        Ok(s) => s,
+        Err(e) => {
+            eprintln!("[iOS FFI] Failed to convert C string: {}", e);
+            return ();
+        }
+    };
+
+    push_new_intent(intent.to_string());
+}

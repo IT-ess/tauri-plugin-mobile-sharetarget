@@ -1,0 +1,13 @@
+# Automatically generated - DO NOT EDIT!
+
+"$schema" = "../../schemas/schema.json"
+
+[[permission]]
+identifier = "allow-pop-intent-queue"
+description = "Enables the pop_intent_queue command without any pre-configured scope."
+commands.allow = ["pop_intent_queue"]
+
+[[permission]]
+identifier = "deny-pop-intent-queue"
+description = "Denies the pop_intent_queue command without any pre-configured scope."
+commands.deny = ["pop_intent_queue"]

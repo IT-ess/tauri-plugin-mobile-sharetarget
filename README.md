@@ -258,9 +258,9 @@ class ShareViewController: UIViewController {
 
 Intents are stored in a Rust queue. Each call to the queue pops the latest intent in the queue.
 
-You can call `getLatestIntent()` to retrieve a raw intent.
+You can call `popIntentQueue()` to retrieve a raw intent in the FIFO queue.
 
-You can also call `getLatestIntentAndExtractText()` that extracts the text of a textual share intent.
+You can also call `popIntentQueueAndExtractText()` that extracts the text payload of a textual share intent.
 
 ## Example
 An example app is provided in this repo under `examples/tauri-app`.

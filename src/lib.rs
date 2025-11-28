@@ -39,8 +39,8 @@ pub static IOS_DEEP_LINK_SCHEME: OnceLock<String> = OnceLock::new();
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("mobile-sharetarget")
         .invoke_handler(tauri::generate_handler![
-            commands::get_latest_intent,
-            commands::get_latest_intent_and_extract_text
+            commands::pop_intent_queue,
+            commands::pop_intent_queue_and_extract_text
         ])
         .setup(|app, api| {
             #[cfg(target_os = "ios")]

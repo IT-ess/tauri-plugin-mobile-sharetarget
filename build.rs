@@ -1,4 +1,4 @@
-const COMMANDS: &[&str] = &["get_latest_intent", "get_latest_intent_and_extract_text"];
+const COMMANDS: &[&str] = &["pop_intent_queue", "pop_intent_queue_and_extract_text"];
 
 fn main() {
     tauri_plugin::Builder::new(COMMANDS)

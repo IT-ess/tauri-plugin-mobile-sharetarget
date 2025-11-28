@@ -23,6 +23,17 @@
       }
     ]
   },
+  "plugins": {
+    "deep-link": {
+      "mobile": [
+        {
+          "scheme": ["tauri-share"],
+          "appLink": false,
+          "pathPrefix": ["/share"]
+        }
+      ]
+    }
+  },
   "bundle": {
     "active": true,
     "targets": "all",

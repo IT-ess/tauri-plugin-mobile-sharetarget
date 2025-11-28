@@ -6,55 +6,57 @@
 //
 
 import UIKit
-import Social
-import MobileCoreServices
 
-class ShareViewController: SLComposeServiceViewController {
+class ShareViewController: UIViewController {
 
-    override func isContentValid() -> Bool {
-        // Validation logic (e.g., check if it's a valid URL)
+  override func viewDidAppear(_ animated: Bool) {
+    super.viewDidAppear(animated)
+    handleShared()
+  }
+  
+  private func handleShared() {
+    guard let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem,
+          let itemProvider = extensionItem.attachments?.first
+    else {
+      self.completeRequest()
+      return
+    }
+    
+    if itemProvider.hasItemConformingToTypeIdentifier("public.url") {
+      itemProvider.loadItem(forTypeIdentifier: "public.url", options: nil) { (urlItem, error) in
+        if let shareURL = urlItem as? URL {
+          let encodedURL = shareURL.absoluteString
+            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
+          let schemeStr = "tauri-share://share?url=\(encodedURL)"
+          
+          if let schemeURL = URL(string: schemeStr) {
+            self.openURL(schemeURL)
+            self.completeRequest()
+          } else {
+            self.completeRequest()
+          }
+        } else {
+          self.completeRequest()
+        }
+      }
+    } else {
+      self.completeRequest()
+    }
+  }
+  
+  private func completeRequest() {
+    self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
+  }
+  
+  @objc func openURL(_ url: URL) -> Bool {
+    var responder: UIResponder? = self
+    while responder != nil {
+      if let application = responder as? UIApplication {
+        application.open(url)
         return true
+      }
+      responder = responder?.next
     }
-
-    override func didSelectPost() {
-        // This is called after the user presses "Post/Share"
-        
-        guard let extensionContext = extensionContext else { return }
-        
-        let attachments = extensionContext.inputItems.first as? NSExtensionItem
-        let contentType = kUTTypeURL as String // We are looking for URLs
-        
-        if let provider = attachments?.attachments?.first {
-            if provider.hasItemConformingToTypeIdentifier(contentType) {
-                provider.loadItem(forTypeIdentifier: contentType, options: nil) { [weak self] (data, error) in
-                    guard error == nil else { return }
-                    
-                    if let url = data as? URL {
-                        self?.saveToAppGroup(url: url.absoluteString)
-                    }
-                    
-                    // Inform the host that we're done, so it unblocks the UI
-                    self?.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
-                }
-            }
-        }
-    }
-
-    private func saveToAppGroup(url: String) {
-        // 1. Access the Shared User Defaults
-        guard let sharedDefaults = UserDefaults(suiteName: "group.com.tauri.share.extension") else {
-            print("Error: Could not load App Group")
-            return
-        }
-        
-        // 2. Read existing queue or create new one
-        var intentQueue = sharedDefaults.stringArray(forKey: "shared_intent_queue") ?? []
-        
-        // 3. Append new URL
-        intentQueue.append(url)
-        
-        // 4. Save back
-        sharedDefaults.set(intentQueue, forKey: "shared_intent_queue")
-        sharedDefaults.synchronize()
-    }
+    return false
+  }
 }

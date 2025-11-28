@@ -3,7 +3,7 @@ use crossbeam_queue::SegQueue;
 static INTENTS: SegQueue<String> = SegQueue::new();
 static TEXT_INTENT_KEY: &str = "android.intent.extra.TEXT";
 
-pub(crate) fn push_new_intent(raw_intent: String) {
+pub fn push_new_intent(raw_intent: String) {
     INTENTS.push(raw_intent);
 }
 
@@ -14,7 +14,12 @@ pub(crate) fn pop_intent() -> Option<String> {
 pub(crate) fn pop_and_extract_text_intent() -> Option<String> {
     let raw_intent_opt = pop_intent();
     if cfg!(target_os = "ios") {
-        raw_intent_opt
+        raw_intent_opt.map(|url| {
+            let prefix = format!("{}://share?url=", crate::IOS_DEEP_LINK_SCHEME.wait());
+            url.strip_prefix(&prefix)
+                .map(|remaining_part| remaining_part.to_string())
+                .expect("Shared URLs should respect this prefix")
+        })
     } else {
         // We only need to extract the text for Android intents
         raw_intent_opt

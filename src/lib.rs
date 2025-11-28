@@ -3,8 +3,6 @@ use tauri::{
     Manager, Runtime,
 };
 
-pub use models::*;
-
 #[cfg(desktop)]
 mod desktop;
 #[cfg(mobile)]
@@ -13,7 +11,6 @@ mod mobile;
 mod commands;
 mod error;
 mod intents;
-mod models;
 
 pub use error::{Error, Result};
 

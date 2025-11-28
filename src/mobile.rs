@@ -4,10 +4,7 @@ use tauri::{
     AppHandle, Runtime,
 };
 
-use crate::{
-    intents::{pop_and_extract_text_intent, pop_intent},
-    PingRequest, PingResponse,
-};
+use crate::intents::{pop_and_extract_text_intent, pop_intent};
 
 #[cfg(target_os = "ios")]
 tauri::ios_plugin_binding!(init_plugin_mobile_sharetarget);
@@ -35,12 +32,5 @@ impl<R: Runtime> MobileSharetarget<R> {
 
     pub fn get_latest_intent_and_extract_text(&self) -> crate::Result<Option<String>> {
         Ok(pop_and_extract_text_intent())
-    }
-
-    pub fn test_hello_world(&self, payload: PingRequest) -> crate::Result<PingResponse> {
-        println!("calling ios fn");
-        self.0
-            .run_mobile_plugin("testHelloWorld", payload)
-            .map_err(Into::into)
     }
 }

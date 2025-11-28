@@ -13,9 +13,14 @@ pub(crate) fn pop_intent() -> Option<String> {
 
 pub(crate) fn pop_and_extract_text_intent() -> Option<String> {
     let raw_intent_opt = pop_intent();
-    raw_intent_opt
-        .map(|i| extract_android_intent_extra(&i, TEXT_INTENT_KEY))
-        .flatten()
+    if cfg!(target_os = "ios") {
+        raw_intent_opt
+    } else {
+        // We only need to extract the text for Android intents
+        raw_intent_opt
+            .map(|i| extract_android_intent_extra(&i, TEXT_INTENT_KEY))
+            .flatten()
+    }
 }
 
 fn extract_android_intent_extra(intent_uri: &str, key_name: &str) -> Option<String> {

@@ -29,6 +29,9 @@ class ExamplePlugin: Plugin {
 
     @_silgen_name("free_hello_result_ffi")
     private static func freeHelloResult(_ result: UnsafeMutablePointer<CChar>)
+    
+    @_silgen_name("push_intent_ffi")
+    private static func pushIntentFFI(_ name: UnsafePointer<CChar>)
 
     static func helloWorld(name: String) -> String? {
       // Call Rust FFI

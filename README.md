@@ -262,6 +262,45 @@ You can call `popIntentQueue()` to retrieve a raw intent in the FIFO queue.
 
 You can also call `popIntentQueueAndExtractText()` that extracts the text payload of a textual share intent.
 
+### Svelte 
+
+Here's a Svelte 5 snippet that uses the plugin to consume the queue when the app is launched or when it is focused.
+```svelte
+  import { popIntentQueueAndExtractText } from 'tauri-plugin-mobile-sharetarget-api';
+  import { listen, type UnlistenFn } from '@tauri-apps/api/event';
+ 	import { platform } from '@tauri-apps/plugin-os';
+
+	let openDrawer = $state(false);
+
+	let sharedTargetUrl: string | undefined = $state();
+	const currentPlatform = platform();
+
+	let focusUnlistener: UnlistenFn;
+
+	onMount(async () => {
+		if (currentPlatform === 'android' || currentPlatform === 'ios') {
+			popIntentAndOpenDrawer();
+
+			//
+			focusUnlistener = await listen('tauri://focus', async () => {
+				popIntentAndOpenDrawer();
+			});
+		}
+	});
+
+	const popIntentAndOpenDrawer = async () => {
+		let potentialIntent = await popIntentQueueAndExtractText();
+		if (potentialIntent) {
+			sharedTargetUrl = decodeURIComponent(potentialIntent);
+			openDrawer = true;
+		}
+	};
+
+	onDestroy(() => {
+		focusUnlistener();
+	});
+	```
+
 ## Example
 An example app is provided in this repo under `examples/tauri-app`.
 

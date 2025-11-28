@@ -295,30 +295,6 @@
       "type": "string",
       "oneOf": [
         {
-          "description": "Enables the get_latest_intent command without any pre-configured scope.",
-          "type": "string",
-          "const": "allow-get-latest-intent",
-          "markdownDescription": "Enables the get_latest_intent command without any pre-configured scope."
-        },
-        {
-          "description": "Denies the get_latest_intent command without any pre-configured scope.",
-          "type": "string",
-          "const": "deny-get-latest-intent",
-          "markdownDescription": "Denies the get_latest_intent command without any pre-configured scope."
-        },
-        {
-          "description": "Enables the get_latest_intent_and_extract_text command without any pre-configured scope.",
-          "type": "string",
-          "const": "allow-get-latest-intent-and-extract-text",
-          "markdownDescription": "Enables the get_latest_intent_and_extract_text command without any pre-configured scope."
-        },
-        {
-          "description": "Denies the get_latest_intent_and_extract_text command without any pre-configured scope.",
-          "type": "string",
-          "const": "deny-get-latest-intent-and-extract-text",
-          "markdownDescription": "Denies the get_latest_intent_and_extract_text command without any pre-configured scope."
-        },
-        {
           "description": "Enables the pop_intent_queue command without any pre-configured scope.",
           "type": "string",
           "const": "allow-pop-intent-queue",

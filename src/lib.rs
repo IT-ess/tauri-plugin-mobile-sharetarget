@@ -1,12 +1,9 @@
-use anyhow::anyhow;
-use std::collections::HashMap;
 use tauri::{
     plugin::{Builder, TauriPlugin},
     Manager, Runtime,
 };
 
 pub use models::*;
-use serde_json::Value;
 
 #[cfg(desktop)]
 mod desktop;
@@ -39,7 +36,6 @@ impl<R: Runtime, T: Manager<R>> crate::MobileSharetargetExt<R> for T {
 }
 
 use std::sync::OnceLock;
-
 pub static IOS_DEEP_LINK_SCHEME: OnceLock<String> = OnceLock::new();
 
 /// Initializes the plugin.
@@ -50,6 +46,7 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::get_latest_intent_and_extract_text
         ])
         .setup(|app, api| {
+            #[cfg(target_os = "ios")]
             IOS_DEEP_LINK_SCHEME
                 .set(
                     extract_deep_link_scheme(&app.config().plugins.0)
@@ -91,23 +88,12 @@ pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_pushIntent(
 }
 
 #[cfg(target_os = "ios")]
-use std::ffi::{c_char, CStr, CString};
-
+use anyhow::anyhow;
 #[cfg(target_os = "ios")]
-#[no_mangle]
-pub unsafe extern "C" fn push_intent_ffi(c_name: *const c_char) {
-    println!("Called hello world !");
-    let intent = match CStr::from_ptr(c_name).to_str() {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("[iOS FFI] Failed to convert C string: {}", e);
-            return ();
-        }
-    };
-
-    push_new_intent(intent.to_string());
-}
-
+use serde_json::Value;
+#[cfg(target_os = "ios")]
+use std::collections::HashMap;
+#[cfg(target_os = "ios")]
 fn extract_deep_link_scheme(plugins_value: &HashMap<String, Value>) -> Result<String> {
     // 1. Get the "deep-link" object
     let deep_link = plugins_value

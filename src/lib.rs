@@ -1,11 +1,3 @@
-use std::ffi::{c_char, CStr, CString};
-
-#[cfg(target_os = "android")]
-use jni::{
-    objects::{JClass, JString},
-    sys::jstring,
-    JNIEnv,
-};
 use tauri::{
     plugin::{Builder, TauriPlugin},
     Manager, Runtime,
@@ -63,6 +55,13 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 }
 
 #[cfg(target_os = "android")]
+use jni::{
+    objects::{JClass, JString},
+    sys::jstring,
+    JNIEnv,
+};
+
+#[cfg(target_os = "android")]
 #[no_mangle]
 pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_pushIntent(
     mut env: JNIEnv,
@@ -79,34 +78,8 @@ pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_pushIntent(
     push_new_intent(input);
 }
 
-#[no_mangle]
-pub unsafe extern "C" fn hello_world_ffi(c_name: *const c_char) -> *mut c_char {
-    println!("Called hello world !");
-    let name = match CStr::from_ptr(c_name).to_str() {
-        Ok(s) => s,
-        Err(e) => {
-            eprintln!("[iOS FFI] Failed to convert C string: {}", e);
-            return std::ptr::null_mut();
-        }
-    };
-
-    let result = format!("Hello, {}!", name);
-
-    match CString::new(result) {
-        Ok(c_str) => c_str.into_raw(),
-        Err(e) => {
-            eprintln!("[iOS FFI] Failed to create C string: {}", e);
-            std::ptr::null_mut()
-        }
-    }
-}
-
-#[no_mangle]
-pub unsafe extern "C" fn free_hello_result_ffi(result: *mut c_char) {
-    if !result.is_null() {
-        drop(CString::from_raw(result));
-    }
-}
+#[cfg(target_os = "ios")]
+use std::ffi::{c_char, CStr, CString};
 
 #[cfg(target_os = "ios")]
 #[no_mangle]

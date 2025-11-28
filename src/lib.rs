@@ -1,9 +1,12 @@
+use anyhow::anyhow;
+use std::collections::HashMap;
 use tauri::{
     plugin::{Builder, TauriPlugin},
     Manager, Runtime,
 };
 
 pub use models::*;
+use serde_json::Value;
 
 #[cfg(desktop)]
 mod desktop;
@@ -22,8 +25,7 @@ use desktop::MobileSharetarget;
 #[cfg(mobile)]
 use mobile::MobileSharetarget;
 
-#[cfg(mobile)]
-use crate::intents::push_new_intent;
+pub use crate::intents::push_new_intent;
 
 /// Extensions to [`tauri::App`], [`tauri::AppHandle`] and [`tauri::Window`] to access the mobile-sharetarget APIs.
 pub trait MobileSharetargetExt<R: Runtime> {
@@ -36,6 +38,10 @@ impl<R: Runtime, T: Manager<R>> crate::MobileSharetargetExt<R> for T {
     }
 }
 
+use std::sync::OnceLock;
+
+pub static IOS_DEEP_LINK_SCHEME: OnceLock<String> = OnceLock::new();
+
 /// Initializes the plugin.
 pub fn init<R: Runtime>() -> TauriPlugin<R> {
     Builder::new("mobile-sharetarget")
@@ -44,6 +50,12 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
             commands::get_latest_intent_and_extract_text
         ])
         .setup(|app, api| {
+            IOS_DEEP_LINK_SCHEME
+                .set(
+                    extract_deep_link_scheme(&app.config().plugins.0)
+                        .expect("Deeplink plugin hasn't been installed or properly configured"),
+                )
+                .expect("Once Lock already set");
             #[cfg(mobile)]
             let mobile_sharetarget = mobile::init(app, api)?;
             #[cfg(desktop)]
@@ -94,4 +106,42 @@ pub unsafe extern "C" fn push_intent_ffi(c_name: *const c_char) {
     };
 
     push_new_intent(intent.to_string());
+}
+
+fn extract_deep_link_scheme(plugins_value: &HashMap<String, Value>) -> Result<String> {
+    // 1. Get the "deep-link" object
+    let deep_link = plugins_value
+        .get("deep-link")
+        .ok_or(anyhow!("Error: Missing 'deep-link' configuration block."))?;
+
+    // 2. Get the "mobile" array
+    let mobile_array = deep_link
+        .get("mobile")
+        .ok_or(anyhow!("Error: Missing 'mobile' key within 'deep-link'."))?
+        .as_array()
+        .ok_or(anyhow!("Error: 'mobile' value is not a JSON array."))?;
+
+    // 3. Get the first element [0] of the mobile array (the object)
+    let first_mobile_obj = mobile_array
+        .get(0)
+        .ok_or(anyhow!("Error: 'mobile' array is empty."))?;
+
+    // 4. Get the "scheme" array from the first mobile object
+    let scheme_array = first_mobile_obj
+        .get("scheme")
+        .ok_or(anyhow!(
+            "Error: Missing 'scheme' key in mobile configuration."
+        ))?
+        .as_array()
+        .ok_or(anyhow!("Error: 'scheme' value is not a JSON array."))?;
+
+    // 5. Get the first element [0] of the scheme array (the string value)
+    let first_scheme_value = scheme_array
+        .get(0)
+        .ok_or(anyhow!("Error: 'scheme' array is empty."))?
+        .as_str()
+        .ok_or(anyhow!("Error: Scheme value is not a string."))?;
+
+    // Return the extracted string value
+    Ok(first_scheme_value.to_string())
 }

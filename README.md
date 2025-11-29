@@ -268,7 +268,8 @@ You can also call `popIntentQueueAndExtractText()` that extracts the text payloa
 
 ### Svelte 
 
-Here's a Svelte 5 snippet that uses the plugin to consume the queue when the app is launched or when it is focused.
+Here's a Svelte 5 snippet that uses the plugin to consume the queue automatically when the app is launched or when it is focused.
+This is the equivalent to the event based approach but we can retry to consume the queue if we missed an event for some reason.
 ```svelte
   import { popIntentQueueAndExtractText } from 'tauri-plugin-mobile-sharetarget-api';
   import { listen, type UnlistenFn } from '@tauri-apps/api/event';
@@ -285,10 +286,13 @@ Here's a Svelte 5 snippet that uses the plugin to consume the queue when the app
 		if (currentPlatform === 'android' || currentPlatform === 'ios') {
 			popIntentAndOpenDrawer();
 
-			//
-			focusUnlistener = await listen('tauri://focus', async () => {
-				popIntentAndOpenDrawer();
-			});
+			// iOS tauri://focus isn't reliable for some reason, so we can use a custom event instead.
+			focusUnlistener = await listen(
+				currentPlatform === 'android' ? 'tauri://focus' : 'new-intent',
+				async () => {
+					await popIntentAndOpenDrawer();
+				}
+			);
 		}
 	});
 
@@ -296,6 +300,7 @@ Here's a Svelte 5 snippet that uses the plugin to consume the queue when the app
 		let potentialIntent = await popIntentQueueAndExtractText();
 		if (potentialIntent) {
 			sharedTargetUrl = decodeURIComponent(potentialIntent);
+			// Or whatever state you need to update when a new intent is received.
 			openDrawer = true;
 		}
 	};

@@ -12,6 +12,14 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        val cargoToml = file("../../Cargo.toml")
+        val libraryName = cargoToml.readText()
+            .lines()
+            .find { it.trim().startsWith("name") }
+            ?.substringAfter("\"")?.substringBefore("\"")
+            ?.replace("-", "_") ?: "unknown"
+        buildConfigField("String", "LIBRARY_NAME", "\"$libraryName\"")
     }
 
     buildTypes {
@@ -30,6 +38,8 @@ android {
     kotlinOptions {
         jvmTarget = "1.8"
     }
+
+    buildFeatures { buildConfig = true }
 }
 
 dependencies {

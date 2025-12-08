@@ -190,59 +190,141 @@ tauri-plugin-deep-link = "2" # Note: you can also make this crate an ios only de
 `src-tauri/gen/apple/NAME_OF_YOUR_SHARE_EXTENSION/ShareViewController.swift`
 ```swift
 import UIKit
+import UniformTypeIdentifiers
 
 class ShareViewController: UIViewController {
-
-  override func viewDidAppear(_ animated: Bool) {
-    super.viewDidAppear(animated)
-    handleShared()
-  }
-  
-  private func handleShared() {
-    guard let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem,
-          let itemProvider = extensionItem.attachments?.first
-    else {
-      self.completeRequest()
-      return
-    }
     
-    if itemProvider.hasItemConformingToTypeIdentifier("public.url") {
-      itemProvider.loadItem(forTypeIdentifier: "public.url", options: nil) { (urlItem, error) in
-        if let shareURL = urlItem as? URL {
-          let encodedURL = shareURL.absoluteString
-            .addingPercentEncoding(withAllowedCharacters: .urlQueryAllowed) ?? ""
-          let schemeStr = "REPLACE-BY-YOUR-APP-SCHEME://share?url=\(encodedURL)"
-          
-          if let schemeURL = URL(string: schemeStr) {
-            self.openURL(schemeURL)
-            self.completeRequest()
-          } else {
-            self.completeRequest()
-          }
-        } else {
-          self.completeRequest()
+    override func viewDidLoad() {
+            super.viewDidLoad()
+            // Minimal UI: Transparent with spinner
+            self.view.backgroundColor = .clear
+            let spinner = UIActivityIndicatorView(style: .large)
+            spinner.center = self.view.center
+            spinner.startAnimating()
+            self.view.addSubview(spinner)
         }
-      }
-    } else {
-      self.completeRequest()
-    }
-  }
+
+        override func viewDidAppear(_ animated: Bool) {
+            super.viewDidAppear(animated)
+            print("🟢 Share Extension: View Did Appear")
+            
+            // 1. Extract Data safely
+            extractSharedURL { [weak self] sharedURL in
+                guard let self = self else { return }
+                
+                guard let url = sharedURL else {
+                    print("🔴 Share Extension: No URL found in shared content.")
+                    self.closeExtension()
+                    return
+                }
+                
+                // 2. Build Deeplink (WITH ENCODING)
+                // If the shared URL has special chars, it MUST be encoded or URL(string:) returns nil
+                let originalString = url.absoluteString
+                
+                // Prepare the query item
+                // e.g., myapp://share?url=https%3A%2F%2Fgoogle.com
+                var components = URLComponents()
+                components.scheme = "REPLACE-BY-YOUR-APP-SCHEME"
+                components.host = "share"
+                components.queryItems = [
+                    URLQueryItem(name: "url", value: originalString)
+                ]
+                
+                guard let deepLink = components.url else {
+                    print("🔴 Share Extension: Could not construct deep link.")
+                    self.closeExtension()
+                    return
+                }
+                
+                print("🟢 Share Extension: Attempting to open -> \(deepLink)")
+
+                // 3. Attempt to Open
+                let success = self.openURL(deepLink)
+                
+                if success {
+                    print("🟢 Share Extension: Open command sent successfully.")
+                    // Give the system time to switch apps before killing this extension
+                    DispatchQueue.main.asyncAfter(deadline: .now() + 0.5) {
+                        self.closeExtension()
+                    }
+                } else {
+                    print("🔴 Share Extension: Trampoline failed. Responder not found.")
+                    // Fallback: Show an alert so the user isn't left confusingly
+                    self.showErrorAndClose()
+                }
+            }
+        }
+
+    
+    // MARK: - Helper Methods
+
+        private func closeExtension() {
+            self.extensionContext?.completeRequest(returningItems: [], completionHandler: nil)
+        }
+        
+        private func showErrorAndClose() {
+            let alert = UIAlertController(title: "Error", message: "Could not open the main app.", preferredStyle: .alert)
+            alert.addAction(UIAlertAction(title: "OK", style: .default, handler: { _ in
+                self.closeExtension()
+            }))
+            self.present(alert, animated: true)
+        }
+
+        // MARK: - Data Extraction
+        private func extractSharedURL(completion: @escaping (URL?) -> Void) {
+            // Safely unwrap extension items
+            guard let extensionItem = extensionContext?.inputItems.first as? NSExtensionItem,
+                  let attachments = extensionItem.attachments else {
+                completion(nil)
+                return
+            }
+            
+            // Look for a URL provider
+            // Note: We use UTType.url.identifier (modern) or kUTTypeURL (legacy)
+            let typeIdentifier = UTType.url.identifier // "public.url"
+            
+            for provider in attachments {
+                if provider.hasItemConformingToTypeIdentifier(typeIdentifier) {
+                    
+                    // Load item safely
+                    provider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { (item, error) in
+                        // This runs on a background thread
+                        DispatchQueue.main.async {
+                            if let error = error {
+                                print("🔴 Load Error: \(error.localizedDescription)")
+                            }
+                            
+                            // Handle the weird ways iOS returns URLs (sometimes NSURL, sometimes URL)
+                            if let url = item as? URL {
+                                completion(url)
+                            } else if let url = item as? NSURL {
+                                completion(url as URL)
+                            } else {
+                                completion(nil)
+                            }
+                        }
+                    }
+                    return // Found one, stop looking
+                }
+            }
+            completion(nil) // No URL found
+        }
   
-  private func completeRequest() {
-    self.extensionContext?.completeRequest(returningItems: nil, completionHandler: nil)
-  }
-  
-  @objc func openURL(_ url: URL) -> Bool {
-    var responder: UIResponder? = self
-    while responder != nil {
-      if let application = responder as? UIApplication {
-        application.open(url)
-        return true
-      }
-      responder = responder?.next
-    }
-    return false
-  }
+    // MARK: - The Trampoline (The Magic)
+        @discardableResult
+        @objc func openURL(_ url: URL) -> Bool {
+            var responder: UIResponder? = self
+            
+            while responder != nil {
+                  if let application = responder as? UIApplication {
+                    application.open(url)
+                    return true
+                  }
+                  responder = responder?.next
+                }
+                return false
+        }
 }
 ```
 5. Add the required permissions to your capabilities (don't forget to use it in your `tauri.conf.json`).

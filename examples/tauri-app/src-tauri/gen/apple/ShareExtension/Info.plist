@@ -21,6 +21,10 @@
 		<string>com.apple.share-services</string>
 		<key>NSExtensionPrincipalClass</key>
         <string>$(PRODUCT_MODULE_NAME).ShareViewController</string>
+        <key>LSApplicationQueriesSchemes</key>
+        <array>
+          <string>tauri-share</string>
+        </array>
 	</dict>
 </dict>
 </plist>

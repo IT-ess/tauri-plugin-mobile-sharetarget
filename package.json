@@ -1,8 +1,21 @@
 {
   "name": "tauri-plugin-mobile-sharetarget-api",
-  "version": "0.1.0",
-  "author": "You",
-  "description": "",
+  "version": "2.0.0",
+  "author": "IT-ess",
+  "description": "JS bindings to use the mobile-sharetarget tauri plugin",
+  "keywords": [
+    "tauri",
+    "plugin",
+    "share",
+    "intent",
+    "target",
+    "extension"
+  ],
+  "license": "MIT",
+  "repository": {
+    "url": "https://github.com/IT-ess/tauri-plugin-mobile-sharetarget"
+  },
+  "readme": "README.md",
   "type": "module",
   "types": "./dist-js/index.d.ts",
   "main": "./dist-js/index.cjs",

@@ -47,8 +47,7 @@ tauri-plugin-mobile-sharetarget = { path = "../../tauri-plugin-mobile-sharetarge
 `package.json`
 ```json
 ...
-// Do not forget to build the package before installing. Adapt the path to your needs or use git
-		"tauri-plugin-mobile-sharetarget-api": "file:../../tauri-plugin-mobile-sharetarget"
+		"tauri-plugin-mobile-sharetarget-api": "^2.0.0"
 ...
 ```
 4. Add the required intent filters
@@ -136,8 +135,7 @@ tauri-plugin-deep-link = "2" # Note: you can also make this crate an ios only de
 `package.json`
 ```json
 ...
-// Do not forget to build the package before installing. Adapt the path to your needs or use git
-		"tauri-plugin-mobile-sharetarget-api": "file:../../tauri-plugin-mobile-sharetarget"
+		"tauri-plugin-mobile-sharetarget-api": "^2.0.0"
 ...
 ```
 `tauri.conf.json`

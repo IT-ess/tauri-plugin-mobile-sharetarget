@@ -1,12 +1,16 @@
 [package]
 name = "tauri-plugin-mobile-sharetarget"
-version = "0.1.0"
-authors = [ "You" ]
-description = ""
+version = "2.0.0"
+authors = [ "IT-ess" ]
+description = "A mobile only Tauri plugin to handle Share Intents / Share extensions on Android & iOS"
 edition = "2021"
 rust-version = "1.77.2"
+keywords = ["tauri", "plugin", "share", "intent", "target", "extension"]
 exclude = ["/examples", "/dist-js", "/guest-js", "/node_modules"]
 links = "tauri-plugin-mobile-sharetarget"
+readme = "README.md"
+license = "MIT"
+repository = "https://github.com/IT-ess/tauri-plugin-mobile-sharetarget"
 
 [dependencies]
 tauri = { version = "2.9.3" }

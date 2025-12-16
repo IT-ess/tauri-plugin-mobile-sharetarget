@@ -193,6 +193,7 @@ tauri-plugin-deep-link = "2" # Note: you can also make this crate an ios only de
 ```swift
 import UIKit
 import UniformTypeIdentifiers
+import Foundation
 
 class ShareViewController: UIViewController {
     
@@ -281,52 +282,88 @@ class ShareViewController: UIViewController {
                 completion(nil)
                 return
             }
-            
-            // Look for a URL provider
-            // Note: We use UTType.url.identifier (modern) or kUTTypeURL (legacy)
-            let typeIdentifier = UTType.url.identifier // "public.url"
-            
+
+            let urlType = UTType.url.identifier // "public.url"
+            let textTypes: [String] = {
+                if #available(iOS 16.0, *) {
+                    return [UTType.text.identifier, UTType.plainText.identifier]
+                } else {
+                    return [UTType.text.identifier]
+                }
+            }()
+
+            // Helper to extract the first URL from a string using a data detector
+            func urlFromString(_ string: String) -> URL? {
+                let detector = try? NSDataDetector(types: NSTextCheckingResult.CheckingType.link.rawValue)
+                let range = NSRange(location: 0, length: (string as NSString).length)
+                let match = detector?.firstMatch(in: string, options: [], range: range)
+                if let match = match, match.resultType == .link, let foundURL = match.url {
+                    return foundURL
+                }
+                // Fallback: direct initializer if the text is exactly a URL
+                return URL(string: string.trimmingCharacters(in: .whitespacesAndNewlines))
+            }
+
+            // 1) Prefer a real URL item provider
             for provider in attachments {
-                if provider.hasItemConformingToTypeIdentifier(typeIdentifier) {
-                    
-                    // Load item safely
-                    provider.loadItem(forTypeIdentifier: typeIdentifier, options: nil) { (item, error) in
-                        // This runs on a background thread
+                if provider.hasItemConformingToTypeIdentifier(urlType) {
+                    provider.loadItem(forTypeIdentifier: urlType, options: nil) { (item, error) in
                         DispatchQueue.main.async {
-                            if let error = error {
-                                print("🔴 Load Error: \(error.localizedDescription)")
-                            }
-                            
-                            // Handle the weird ways iOS returns URLs (sometimes NSURL, sometimes URL)
+                            if let error = error { print("🔴 Load Error (URL): \(error.localizedDescription)") }
                             if let url = item as? URL {
                                 completion(url)
                             } else if let url = item as? NSURL {
                                 completion(url as URL)
+                            } else if let string = item as? String, let url = urlFromString(string) {
+                                completion(url)
                             } else {
                                 completion(nil)
                             }
                         }
                     }
-                    return // Found one, stop looking
+                    return
                 }
             }
-            completion(nil) // No URL found
-        }
-  
-    // MARK: - The Trampoline (The Magic)
-        @discardableResult
-        @objc func openURL(_ url: URL) -> Bool {
-            var responder: UIResponder? = self
-            
-            while responder != nil {
-                  if let application = responder as? UIApplication {
-                    application.open(url)
-                    return true
-                  }
-                  responder = responder?.next
+
+            // 2) Fall back to text providers that may contain a URL
+            for provider in attachments {
+                for type in textTypes {
+                    if provider.hasItemConformingToTypeIdentifier(type) {
+                        provider.loadItem(forTypeIdentifier: type, options: nil) { (item, error) in
+                            DispatchQueue.main.async {
+                                if let error = error { print("🔴 Load Error (Text): \(error.localizedDescription)") }
+                                if let string = item as? String, let url = urlFromString(string) {
+                                    completion(url)
+                                } else if let data = item as? Data, let string = String(data: data, encoding: .utf8), let url = urlFromString(string) {
+                                    completion(url)
+                                } else {
+                                    completion(nil)
+                                }
+                            }
+                        }
+                        return
+                    }
                 }
-                return false
+            }
+
+            // No suitable provider found
+            completion(nil)
         }
+
+    // MARK: - The Trampoline (The Magic)
+    @discardableResult
+    @objc func openURL(_ url: URL) -> Bool {
+        var responder: UIResponder? = self
+        
+        while responder != nil {
+            if let application = responder as? UIApplication {
+                application.open(url)
+                return true
+            }
+            responder = responder?.next
+        }
+        return false
+    }
 }
 ```
 5. Define and setup an "App Group" capability for both your main app and Share Extension in Xcode

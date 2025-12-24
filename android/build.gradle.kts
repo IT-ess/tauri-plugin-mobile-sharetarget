@@ -12,6 +12,14 @@ android {
 
         testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
         consumerProguardFiles("consumer-rules.pro")
+
+        val libName = project.findProperty("tauri_app_lib_name") as? String ?: "tauri_app_lib"
+
+        buildConfigField("String", "TAURI_LIBRARY_NAME", "\"$libName\"")
+    }
+
+    buildFeatures {
+        buildConfig = true
     }
 
     buildTypes {

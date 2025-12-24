@@ -7,10 +7,10 @@ class Sharetarget {
 
     init {
         try {
-            System.loadLibrary("tauri_plugin_mobile_sharetarget")
-            Log.d(TAG, "Successfully loaded libtauri_app_lib.so")
+            System.loadLibrary(BuildConfig.TAURI_LIBRARY_NAME)
+            Log.d(TAG, "Successfully loaded ${BuildConfig.TAURI_LIBRARY_NAME}")
         } catch (e: UnsatisfiedLinkError) {
-            Log.e(TAG, "Faileapp_libd to load libtauri_app_lib.so", e)
+            Log.e(TAG, "Could not load native library", e)
             throw e
         }
     }

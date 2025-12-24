@@ -63,7 +63,6 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 #[cfg(target_os = "android")]
 use jni::{
     objects::{JClass, JString},
-    sys::jstring,
     JNIEnv,
 };
 

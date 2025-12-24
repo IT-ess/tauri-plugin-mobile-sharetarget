@@ -13,7 +13,7 @@ license = "MIT"
 repository = "https://github.com/IT-ess/tauri-plugin-mobile-sharetarget"
 
 [dependencies]
-tauri = { version = "2.9.3" }
+tauri = { version = "2.9.5" }
 serde = "1.0"
 thiserror = "2"
 crossbeam-queue = "0.3.12"
@@ -24,4 +24,4 @@ anyhow = "1.0.100"
 jni = "0.21.1"
 
 [build-dependencies]
-tauri-plugin = { version = "2.5.1", features = ["build"] }
+tauri-plugin = { version = "2.5.2", features = ["build"] }

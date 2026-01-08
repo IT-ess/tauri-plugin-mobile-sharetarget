@@ -179,10 +179,6 @@ tauri-plugin-deep-link = "2" # Note: you can also make this crate an ios only de
 		<string>com.apple.share-services</string>
 		<key>NSExtensionPrincipalClass</key>
     <string>$(PRODUCT_MODULE_NAME).ShareViewController</string>
-    <key>LSApplicationQueriesSchemes</key>
-    <array>
-      <string>REPLACE-BY-YOUR-SCHEME</string>
-    </array>
 	</dict>
 </dict>
 </plist>
@@ -364,8 +360,7 @@ class ShareViewController: UIViewController {
     }
 }
 ```
-5. Define and setup an "App Group" capability for both your main app and Share Extension in Xcode
-6. Add this to the `src-tauri/Info.ios.plist` file of your app :
+5. Add this to the `src-tauri/Info.ios.plist` file of your app :
 ```plist
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
@@ -379,7 +374,7 @@ class ShareViewController: UIViewController {
 </plist>
 
 ```
-7. Add the required permissions to your capabilities (don't forget to use it in your `tauri.conf.json`).
+6. Add the required permissions to your capabilities (don't forget to use it in your `tauri.conf.json`).
 `src-tauri/capabilities/mobile.json`
 ```json
 {

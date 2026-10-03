@@ -62,26 +62,23 @@ pub fn init<R: Runtime>() -> TauriPlugin<R> {
 
 #[cfg(target_os = "android")]
 use jni::{
-    objects::{JClass, JString},
-    sys::jstring,
-    JNIEnv,
+    objects::{JObject, JString},
+    EnvUnowned,
 };
 
 #[cfg(target_os = "android")]
 #[no_mangle]
-pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_pushIntent(
-    mut env: JNIEnv,
-    _class: JClass,
-    intent: JString,
+pub extern "system" fn Java_com_plugin_mobilesharetarget_Sharetarget_pushIntent<'caller>(
+    mut unowned_env: EnvUnowned<'caller>,
+    _this: JObject<'caller>,
+    intent: JString<'caller>,
 ) {
-    println!("Calling JNI Hello World!");
-
-    let input: String = env
-        .get_string(&intent)
-        .expect("Couldn't get java string!")
-        .into();
-
-    push_new_intent(input);
+    unowned_env
+        .with_env(|env| -> jni::errors::Result<()> {
+            push_new_intent(intent.try_to_string(env)?);
+            Ok(())
+        })
+        .resolve::<jni::errors::ThrowRuntimeExAndDefault>();
 }
 
 #[cfg(target_os = "ios")]
